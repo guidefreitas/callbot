@@ -1,0 +1,3 @@
+server_functions/node_modules
+embedded/.pioenvs/
+.DS_Store
