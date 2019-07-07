@@ -7,9 +7,7 @@
 #include <ESP8266HTTPClient.h>
 
 #define FIREBASE_HOST "https://callbotapp-1d5dc.firebaseio.com/"
-#define FIREBASE_AUTH "<token>"
-
-int LEDS[] = { D8, D6, D7 };
+#define FIREBASE_AUTH "13MEycrGrJxodhos2MWbakXZ4kCwd3ymyHFfWiQx"
 
 unsigned long sendDataPrevMillis = 0;
 
@@ -24,9 +22,12 @@ void setup() {
   WiFiManager wifiManager;
   wifiManager.autoConnect();
 
-  for(int i=0; i < sizeof(LEDS)/sizeof(LEDS[0]); i++) {
-    pinMode(LEDS[i], OUTPUT);
-  }
+  pinMode(D1, OUTPUT);
+  pinMode(D3, OUTPUT);
+  pinMode(BUILTIN_LED, OUTPUT);
+
+  digitalWrite(D1, LOW);
+  digitalWrite(D3, LOW);
 
   Firebase.begin(FIREBASE_HOST, FIREBASE_AUTH);
   Firebase.reconnectWiFi(true);
@@ -42,15 +43,15 @@ void setup() {
 }
 
 void turnOn() {
-  for(int i=0; i < sizeof(LEDS)/sizeof(LEDS[0]); i++) {
-    digitalWrite(LEDS[i], HIGH);
-  }
+  pinMode(BUILTIN_LED, HIGH);
+  digitalWrite(D1, HIGH);
+  digitalWrite(D3, LOW);
 }
 
 void turnOff() {
-  for(int i=0; i < sizeof(LEDS)/sizeof(LEDS[0]); i++) {
-    digitalWrite(LEDS[i], LOW);
-  }
+  pinMode(BUILTIN_LED, LOW);
+  digitalWrite(D1, LOW);
+  digitalWrite(D3, LOW);
 }
 
 void loop() {
