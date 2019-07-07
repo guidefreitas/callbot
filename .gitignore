@@ -1,3 +1,7 @@
 server_functions/node_modules
 embedded/.pioenvs/
+embedded/call_bot/.vscode/
 .DS_Store
+.ipch
+.bin
+.vscode/ipch
