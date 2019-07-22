@@ -4,7 +4,8 @@ const request = require('request');
 
 admin.initializeApp(functions.config().firebase);
 
-const FIREBASE_URL = 'https://hooks.slack.com/services/...';
+const FIREBASE_URL = 'https://slack.com/api/chat.postMessage';
+const FIREBASE_TOKEN = 'xoxb-xxx';
 
 exports.status = functions.https.onRequest((request, response) => {
   admin.database().ref('/call').once('value', (snapshot) => {
@@ -26,6 +27,7 @@ exports.activate = functions.https.onRequest((request, response) => {
   admin.database().ref('/call').set({
     status: 1,
     username: '',
+    user_id: '',
     activatedAt: null,
   });
   response.send("ok");
@@ -35,6 +37,7 @@ exports.deactivate = functions.https.onRequest((request, response) => {
   admin.database().ref('/call').set({
     status: 0,
     username: '',
+    user_id: '',
     activatedAt: null,
   });
   response.send("ok");
@@ -48,10 +51,11 @@ function getCommandHelp() {
 `;
 }
 
-function startCallbot(username) {
+function startCallbot(username, user_id) {
   admin.database().ref('/call').set({
     status: 1,
     username: username,
+    user_id: user_id,
     activatedAt: Date.now(),
   });
 }
@@ -60,14 +64,14 @@ function stopCallbot() {
   admin.database().ref('/call').set({
     status: 0,
     username: '',
+    user_id: '',
     activatedAt: null,
   });
 }
 
 function sendSlackMessage(data) {
   const msgPayload = {
-    channel: `@${data.username}`,
-    as_user: 'callbot',
+    channel: `${data.user_id}`,
     text: 'Você ainda está em call? Se não estiver, lembre-se de desativar o callbot com /callbot stop'
   }
 
@@ -77,6 +81,7 @@ function sendSlackMessage(data) {
     url: FIREBASE_URL,
     headers: {
        'Content-Type': 'application/json',
+       'Authorization': 'Bearer ' + FIREBASE_TOKEN,
     },
     body: payloadJson,
   }
@@ -117,7 +122,7 @@ exports.call = functions.https.onRequest((request, response) => {
   var commandText =  request.body.text;
 
   switch(commandText) {
-    case 'start': startCallbot(request.body.user_name);
+    case 'start': startCallbot(request.body.user_name, request.body.user_id);
                   response.send('Callbot ligado');
                   break;
     
